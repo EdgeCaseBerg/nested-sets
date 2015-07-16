@@ -18,11 +18,12 @@ class ApplicationService {
 		}
 	}
 
-	val categoryWithDepthParser = {
+	val categoryWithDepthAndCountParser = {
 		get[Int]("category_id") ~
 		get[String]("name") ~ 
-		get[Int]("depth") map {
-			case id ~ name ~ depth => new Category(id, name, depth)
+		get[Int]("depth") ~ 
+		get[Int]("productCount") map {
+			case id ~ name ~ depth ~ productCount => new Category(id, name, depth, productCount)
 		}	
 	}
 
@@ -38,29 +39,45 @@ class ApplicationService {
 		DB.withConnection { implicit connection =>
 			val categories : List[Category] = SQL(
 				"""
-				SELECT node.category_id, node.name, (COUNT(parent.name) - 1) AS depth
-				FROM nested_category AS node,
-				nested_category AS parent
-				WHERE node.lft BETWEEN parent.lft AND parent.rgt
-				GROUP BY node.category_id
-				ORDER BY node.lft;
+				SELECT a.category_id, a.name, depth, productCount FROM 
+				(
+					SELECT node.category_id, node.name, (COUNT(parent.name) - 1) AS depth
+					FROM nested_category AS node,
+					nested_category AS parent
+					WHERE node.lft BETWEEN parent.lft AND parent.rgt
+					GROUP BY node.name
+					ORDER BY node.lft
+				) a JOIN
+				(
+					SELECT parent.category_id, parent.name, COUNT(product.name) as productCount
+					FROM nested_category AS node ,
+					nested_category AS parent,
+					product
+					WHERE node.lft BETWEEN parent.lft AND parent.rgt
+					AND node.category_id = product.category_id
+					GROUP BY parent.name
+					ORDER BY node.lft
+				) b ON a.category_id = b.category_id
 				"""
-	    ).as(categoryWithDepthParser.*)
+	    ).as(categoryWithDepthAndCountParser.*)
       categories
 		}
 	}
 
-	def getAllInCategory(categoryId: Int) : List[Category] = {
+	def getProductsInCategory(categoryId: Int) : List[Product] = {
 		DB.withConnection { implicit connection =>
 			val categories = SQL(
-				"""	SELECT node.category_id, node.name
-						FROM nested_category AS node,
-						nested_category AS parent
-						WHERE node.lft BETWEEN parent.lft AND parent.rgt
-						AND parent.category_id = {category}
-						ORDER BY node.lft;
+				"""	
+				SELECT product_id, product.name, product.category_id 
+				FROM nested_category AS node,
+				nested_category AS parent,
+				product
+				WHERE node.lft BETWEEN parent.lft AND parent.rgt
+				AND parent.category_id = {category}
+				AND product.category_id = node.category_id
+				ORDER BY node.lft
 				"""
-			).on("category" -> categoryId).as(fullCategoryParser.*)
+			).on("category" -> categoryId).as(fullProductParser.*)
 			categories
 		}
 	}
