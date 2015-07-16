@@ -1,4 +1,4 @@
 GET /assets/*file controllers.Assets.at(path="/public", file)
 
 GET / @controllers.Application.index
-GET /:cat @controllers.Application.subtree(cat)
+GET /subtree/:cat @controllers.Application.subtree(cat: Int)

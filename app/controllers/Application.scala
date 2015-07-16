@@ -13,8 +13,8 @@ class Application extends Controller {
 		Ok(cats.mkString(","))
 	}
 
-	def subtree(categoryName: String) = Action {
-		val cats = applicationService.getAllInCategory(categoryName)
+	def subtree(categoryId: Int) = Action {
+		val cats = applicationService.getAllInCategory(categoryId)
 		Ok(cats.mkString(","))
 	}
 }
