@@ -10,7 +10,7 @@ class Application extends Controller {
 	val applicationService = new ApplicationService()
 	def index = Action {
 		val cats = applicationService.getCategories()
-		Ok(cats.mkString(","))
+		Ok(views.html.index(cats))
 	}
 
 	def subtree(categoryId: Int) = Action {

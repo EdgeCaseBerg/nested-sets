@@ -1,0 +1,32 @@
+@import models._
+@(categories: List[Category])
+
+@templates.standard() {
+	<h2>Nested Sets are Pretty cool!</h2>
+	<section>
+		<nav>
+			<ul>
+				@for(cat <- categories) {
+					<li name="categories" data-id="@cat.id">@cat.name</li>
+				}
+			</ul>
+		</nav>
+	</section>
+	<section>
+	<iframe id="iframe" src="/subtree/1"></iframe>
+	</section>
+	<strong id="javascript-warning">You need javascript enabled to view this demo</strong>
+	<script type="text/javascript">
+		//<!-- 
+		document.getElementById("javascript-warning").remove()
+		var iframe = document.getElementById("iframe")
+		var categories = document.getElementsByName("categories")
+		for (var i = categories.length - 1; i >= 0; i--) {
+			categories[i].onclick = function() {
+				var idToShow = this.getAttribute('data-id')
+				iframe.src = '/subtree/' + idToShow
+			}
+		};
+		//-->
+	</script>
+}
