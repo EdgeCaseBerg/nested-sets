@@ -35,4 +35,22 @@ class ApplicationService {
 		}
 	}
 
+	def getAllInCategory(categoryName: String) : List[Category] = {
+		DB.withConnection { implicit connection =>
+			/* Note that querying by name means duplicate tags might be a bit off */
+			val categories = SQL(
+				"""	SELECT node.category_id, node.name
+						FROM nested_category AS node,
+						nested_category AS parent
+						WHERE node.lft BETWEEN parent.lft AND parent.rgt
+						AND parent.name = {category}
+						ORDER BY node.lft;
+				"""
+			).on("category" -> categoryName).as(fullCategoryParser.*)
+			categories
+		}
+	}
+	
+
+
 }
