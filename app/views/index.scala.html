@@ -7,7 +7,7 @@
 		<nav>
 			<ul>
 				@for(cat <- categories) {
-					<li name="categories" data-id="@cat.id">@cat.name</li>
+					<li name="categories" data-id="@cat.id">@{Html("&nbsp;"*cat.depth*5)}<span> @cat.name</span></li>
 				}
 			</ul>
 		</nav>
