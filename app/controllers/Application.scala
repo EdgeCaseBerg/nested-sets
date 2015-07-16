@@ -14,7 +14,7 @@ class Application extends Controller {
 	}
 
 	def subtree(categoryId: Int) = Action {
-		val cats = applicationService.getAllInCategory(categoryId)
-		Ok(cats.mkString(","))
+		val prods = applicationService.getProductsInCategory(categoryId)
+		Ok(prods.mkString(","))
 	}
 }
