@@ -1,0 +1,13 @@
+@(contentList: List[models.Content])
+
+<html>
+	<head>
+		<title>Partial Content</title>
+	</head>
+	<body>
+		<ul>
+			@for(content <- contentList) {
+<li data-id="@content.id">@content.name</li>
+			}
+		</ul>
+	</body>

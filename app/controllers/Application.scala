@@ -15,6 +15,6 @@ class Application extends Controller {
 
 	def subtree(categoryId: Int) = Action {
 		val prods = applicationService.getProductsInCategory(categoryId)
-		Ok(prods.mkString(","))
+		Ok(views.html.templates.contentList(prods))
 	}
 }
