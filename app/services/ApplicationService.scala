@@ -18,6 +18,14 @@ class ApplicationService {
 		}
 	}
 
+	val categoryWithDepthParser = {
+		get[Int]("category_id") ~
+		get[String]("name") ~ 
+		get[Int]("depth") map {
+			case id ~ name ~ depth => new Category(id, name, depth)
+		}	
+	}
+
 	val fullProductParser = {
 		get[Int]("product_id") ~
 		get[String]("name") ~ 
@@ -29,8 +37,15 @@ class ApplicationService {
 	def getCategories() : List[Category]  = {
 		DB.withConnection { implicit connection =>
 			val categories : List[Category] = SQL(
-				"""SELECT category_id, name FROM nested_category"""
-	    ).as(fullCategoryParser.*)
+				"""
+				SELECT node.category_id, node.name, (COUNT(parent.name) - 1) AS depth
+				FROM nested_category AS node,
+				nested_category AS parent
+				WHERE node.lft BETWEEN parent.lft AND parent.rgt
+				GROUP BY node.category_id
+				ORDER BY node.lft;
+				"""
+	    ).as(categoryWithDepthParser.*)
       categories
 		}
 	}
