@@ -8,13 +8,16 @@ CREATE TABLE nested_category (
 	category_id INT AUTO_INCREMENT PRIMARY KEY,
 	name VARCHAR(20) NOT NULL,
 	lft INT NOT NULL,
-	rgt INT NOT NULL
+	rgt INT NOT NULL,
+	INDEX (`lft`),
+	INDEX (`rgt`)
 ) ENGINE InnoDB COLLATE='utf8_unicode_ci';
 
 CREATE TABLE product(
 	product_id INT AUTO_INCREMENT PRIMARY KEY,
 	name VARCHAR(40),
-	category_id INT NOT NULL
+	category_id INT NOT NULL,
+    CONSTRAINT FOREIGN KEY (`category_id`) REFERENCES `nested_category` (`category_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE InnoDB COLLATE='utf8_unicode_ci';
 
 
